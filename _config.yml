@@ -1,5 +1,5 @@
 # Site settings
-title: Metaphor
+title: firstmoonlight
 smalltalk: "A simple Blog"
 description: > # My blog Powred by jekyll
 baseurl: "" # the subpath of your site, e.g. /blog/
