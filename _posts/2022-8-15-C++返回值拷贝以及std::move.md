@@ -51,13 +51,16 @@ int main() {
 编译：`g++ -fno-elide-constructors -g -o test28_RVO test28_RVO.cpp`。
 结果打印：如下图所示。
 * 定义拷贝构造函数以及移动构造函数的情况下：
-![ce0743357eb6a94bd12d43eb59364cdb.png](en-resource://database/3925:1)
+
+<img src="https://firstmoonlight.github.io/img/Image11.png" width="70%">
 
 * 定义拷贝构造函数而未定义移动构造函数的情况下：
-![278a359b27b0a27023cfb0f44ecfcf5a.png](en-resource://database/3929:1)
+
+<img src="https://firstmoonlight.github.io/img/Image12.png" width="70%">
 
 结果分析：从打印可以分析出，在关闭RVO优化的情况下，C++返回一个对象会调用拷贝构造函数（或者移动构造函数）2次。分析其汇编代码，可知，在`main`函数调用函数`fun1()`的时候，调用者会将一个栈的地址传递给`fun1()`。在函数`fun1()`内，当调用构造函数创建`obj`之后，会将`obj`拷贝到这个栈的地址，作为一个临时对象。函数`fun()`调用结束之后，会再调用一次拷贝构造函数，临时对象拷贝到接收者即`a`中。
-![0bcb1f365987d04d8956936dcbd62835.png](en-resource://database/3931:1)
+
+<img src="https://firstmoonlight.github.io/img/Image13.png" width="70%">
 
 ## 在RVO下
 代码和上面的相同。
@@ -76,10 +79,13 @@ int main() {
 ```
 编译：`g++  -g -o test28_RVO test28_RVO.cpp`。
 结果打印：如下图所示。
-![4ee612652296b5c29e03f901e82d35bd.png](en-resource://database/3933:1)
+
+<img src="https://firstmoonlight.github.io/img/Image14.png" width="70%">
+
 结果分析：在启用RVO优化的情况下，只调用了一次构造函数，拷贝构造函数没有被调用。
 从汇编代码结果可以看出，`main`函数将地址`-0x1c(%rbp)`传递给函数`fun1()`，之后，`fun1()`在调用`Obj`构造函数的时候，直接在这个地址上进行构造，免去了临时对象的创建以及拷贝。
-![e1bfe9fb1edcfc88e60c4bb7fcb76db1.png](en-resource://database/3935:1)
+
+<img src="https://firstmoonlight.github.io/img/Image15.png" width="70%">
 
 ## RVO的条件
 《modern effective c++》中指出，在开启RVO之后，返回局部对象只有在满足以下两个条件的情况下，编译器才会进行RVO优化。
@@ -105,10 +111,14 @@ int main() {
 编译：`g++  -g -o test28_RVO test28_RVO.cpp`。
 结果打印：如下图所示
 * 定义拷贝构造函数以及移动构造函数的情况下：
-![b916badbf0f89135984b601890fd6a70.png](en-resource://database/3937:1)
+
+<img src="https://firstmoonlight.github.io/img/Image16.png" width="70%">
+
 * 定义拷贝构造函数，未移动构造函数的情况下(之所以编译器未报错，是因为**const修饰的左值形参能够接收一个右值实参**)：
-![9b68f7dc280dbebda99e9c379e4297a0.png](en-resource://database/3941:1)
+
+<img src="https://firstmoonlight.github.io/img/Image17.png" width="70%">
 
 结果分析：从汇编代码中可以看出，main将变量`a`的地址传递给`fun2()`。`fun2()`创建`Obj obj`，然后调用移动构造函数将`obj`移动到`a`中。
-![ff595eeb86c59e75fab926382c4b1911.png](en-resource://database/3939:1)
+
+<img src="https://firstmoonlight.github.io/img/Image18.png" width="70%">
 
